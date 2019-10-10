@@ -41,20 +41,20 @@
         app:layout_constraintTop_toBottomOf="@+id/save" />
 
     <TextView
-        android:id="@+id/textKey"
+        android:id="@+id/firstName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Key"
+        android:text="First"
         app:layout_constraintBottom_toBottomOf="@+id/inputKey"
         app:layout_constraintEnd_toStartOf="@+id/inputKey"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/inputKey" />
 
     <TextView
-        android:id="@+id/textValue"
+        android:id="@+id/lastName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="value"
+        android:text="Last"
         app:layout_constraintBottom_toBottomOf="@+id/inputValue"
         app:layout_constraintEnd_toStartOf="@+id/inputValue"
         app:layout_constraintStart_toStartOf="parent"

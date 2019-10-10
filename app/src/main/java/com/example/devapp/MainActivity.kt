@@ -7,6 +7,7 @@ import android.widget.Button
 import android.widget.EditText
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 
 class MainActivity : AppCompatActivity() {
 
@@ -16,7 +17,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        db = FirebaseFirestore.getInstance().document("testCollection/testDocument")
+        db = FirebaseFirestore.getInstance().document("NowIsHot/Member")
 
         val button = findViewById<Button>(R.id.save)
 
@@ -43,7 +44,7 @@ class MainActivity : AppCompatActivity() {
             )
 
             db
-                .set(dataToSave)
+                .set(dataToSave, SetOptions.merge())
                 .addOnSuccessListener { Log.d("print", "Document successfully written!") }
                 .addOnFailureListener { e -> Log.w("print", "Error writing document", e) }
         }
