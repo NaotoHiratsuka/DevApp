@@ -27,14 +27,15 @@ class MainActivity : AppCompatActivity() {
 
         val db = FirebaseFirestore.getInstance()
 
-        db.collection("messages").addSnapshotListener { snapshot, e ->
+        val docRef = db.collection("messages")
+            docRef.orderBy("timestamp").addSnapshotListener { snapshot, e ->
             if (e != null) {
                 Log.w("print", "Listen failed.", e)
                 return@addSnapshotListener
             }
 
             if (snapshot != null) {
-                val results = snapshot.toObjects(ChatBlock::class.java).sortedBy { chatBlock -> chatBlock.timestamp}
+                val results = snapshot.toObjects(ChatBlock::class.java)
                 recyclerView.adapter = ChatAdapter(this, results)
                 Log.d("print", "Current data: ${snapshot.documents}")
             } else {
