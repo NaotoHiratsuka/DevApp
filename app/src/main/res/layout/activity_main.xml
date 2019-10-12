@@ -29,15 +29,14 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/inputKey" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/list"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginBottom="32dp"
+    <RatingBar
+        android:id="@+id/ratingBar"
+        android:layout_width="120dp"
+        android:layout_height="34dp"
+        android:layout_marginStart="336dp"
+        android:layout_marginBottom="604dp"
         app:layout_constraintBottom_toTopOf="@+id/inputKey"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintStart_toStartOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
