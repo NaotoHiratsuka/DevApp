@@ -37,6 +37,7 @@ class MainActivity : AppCompatActivity() {
             if (snapshot != null) {
                 val results = snapshot.toObjects(ChatBlock::class.java)
                 recyclerView.adapter = ChatAdapter(this, results)
+                recyclerView.scrollToPosition(recyclerView.adapter!!.itemCount - 1)
                 Log.d("print", "Current data: ${snapshot.documents}")
             } else {
                 Log.d("print", "Current data: null")
