@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
+import java.text.SimpleDateFormat
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
@@ -79,8 +80,8 @@ class MainActivity : AppCompatActivity() {
 }
 
 data class ChatBlock(
-    val message: String = "",
-    val timestamp: Date = Date()
+    val message: String? = "",
+    val timestamp: Date? = Date()
 )
 
 class ChatAdapter(private val context: Context, private var items: List<ChatBlock>) :
@@ -88,13 +89,19 @@ class ChatAdapter(private val context: Context, private var items: List<ChatBloc
 
     class ChatViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val itemMessage: TextView = view.findViewById(R.id.message)
+        val itemTimestamp: TextView = view.findViewById(R.id.timestamp)
     }
 
     override fun getItemCount() = items.size
 
     override fun onBindViewHolder(holder: ChatViewHolder, position: Int) {
         val item = items[position]
+        val sdf = SimpleDateFormat("yyyy/MM/dd HH:mm", Locale.JAPANESE)
         holder.itemMessage.text = item.message
+        if (item.timestamp != null) {
+            val timestamp = sdf.format(item.timestamp)
+            holder.itemTimestamp.text = timestamp
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatViewHolder =
