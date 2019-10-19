@@ -96,7 +96,7 @@ class ChatAdapter(private val context: Context, private var items: List<ChatBloc
 
     override fun onBindViewHolder(holder: ChatViewHolder, position: Int) {
         val item = items[position]
-        val sdf = SimpleDateFormat("yyyy/MM/dd HH:mm", Locale.JAPANESE)
+        val sdf = SimpleDateFormat("MM/dd HH:mm", Locale.JAPANESE)
         holder.itemMessage.text = item.message
         if (item.timestamp != null) {
             val timestamp = sdf.format(item.timestamp)
