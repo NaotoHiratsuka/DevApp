@@ -7,11 +7,11 @@ import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.widget.EditText
-import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
@@ -20,43 +20,48 @@ import java.util.*
 
 class ChatActivity : AppCompatActivity() {
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.top, menu)
-        return super.onCreateOptionsMenu(menu)
+    override fun onSupportNavigateUp(): Boolean {
+        val intent = Intent(this, RoomActivity::class.java)
+        startActivity(intent)
+        return super.onSupportNavigateUp()
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        when(item?.itemId)  {
-            R.id.top -> {
-                val intent = Intent(this, TitleActivity::class.java)
-                startActivity(intent)
-            }
-        }
-        return super.onOptionsItemSelected(item)
+    companion object {
+        const val KEY_ROOM = "RoomBlock"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.chat)
+        setSupportActionBar(findViewById(R.id.toolbar))
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+        val state = intent.getSerializableExtra(KEY_ROOM)
 
         val recyclerView = findViewById<RecyclerView>(R.id.list)
 
         val db = FirebaseFirestore.getInstance()
 
-        val docRef = db.collection("messages")
+        if (state is RoomBlock) {
+            supportActionBar?.title = state.name
+            val docRef = db.collection(state.messagePath)
             docRef.orderBy("timestamp").addSnapshotListener { snapshot, e ->
-            if (e != null) {
-                Log.w("print", "Listen failed.", e)
-                return@addSnapshotListener
-            }
+                if (e != null) {
+                    Log.w("print", "Listen failed.", e)
+                    return@addSnapshotListener
+                }
 
-            if (snapshot != null) {
-                val results = snapshot.toObjects(ChatBlock::class.java)
-                recyclerView.adapter = ChatAdapter(this, results)
-                recyclerView.scrollToPosition(recyclerView.adapter!!.itemCount - 1)
-                Log.d("print", "Current data: ${snapshot.documents}")
-            } else {
-                Log.d("print", "Current data: null")
+                if (snapshot != null) {
+                    val results =
+                        snapshot.toObjects(
+                            ChatBlock::class.java, DocumentSnapshot.ServerTimestampBehavior.ESTIMATE
+                        )
+                    recyclerView.adapter = ChatAdapter(this, results)
+                    recyclerView.scrollToPosition(recyclerView.adapter!!.itemCount - 1)
+                    Log.d("print", "Current data: ${snapshot.documents}")
+                } else {
+                    Log.d("print", "Current data: null")
+                }
             }
         }
         recyclerView.layoutManager = LinearLayoutManager(
@@ -64,13 +69,13 @@ class ChatActivity : AppCompatActivity() {
 
         val arrow = findViewById<ImageView>(R.id.send)
         arrow.setOnClickListener {
-            val inputKeyEditText = findViewById<EditText>(R.id.inputKey)
-            val inputKeyText = inputKeyEditText.text.toString()
+            val inputEditText = findViewById<EditText>(R.id.input)
+            val inputText = inputEditText.text.toString()
 
             var isFailed = false
 
-            if (inputKeyText.isEmpty()) {
-                inputKeyEditText.error = "Please input anything."
+            if (inputText.isEmpty()) {
+                inputEditText.error = "Please input anything."
                 isFailed = true
             }
 
@@ -78,25 +83,30 @@ class ChatActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            inputKeyEditText.text.clear()
+            inputEditText.text.clear()
 
             val dataToSave = hashMapOf(
-                "message" to inputKeyText,
+                "message" to inputText,
                 "timestamp" to FieldValue.serverTimestamp()
             )
 
-            db.collection("messages").document()
-                .set(dataToSave, SetOptions.merge())
-                .addOnSuccessListener {
-                    Log.d("print", "Document successfully written!") }
-                .addOnFailureListener { e -> Log.w("print", "Error writing document", e) }
+            if (state is RoomBlock) {
+                db.collection(state.messagePath).document()
+                    .set(dataToSave, SetOptions.merge())
+                    .addOnSuccessListener {
+                        Log.d("print", "Document successfully written!")
+                    }
+                    .addOnFailureListener { e ->
+                        Log.w("print", "Error writing document", e)
+                    }
+            }
         }
     }
 }
 
 data class ChatBlock(
-    val message: String? = "",
-    val timestamp: Date? = Date()
+    val message: String = "",
+    val timestamp: Date = Date()
 )
 
 class ChatAdapter(private val context: Context, private var items: List<ChatBlock>) :
@@ -113,12 +123,11 @@ class ChatAdapter(private val context: Context, private var items: List<ChatBloc
         val item = items[position]
         val sdf = SimpleDateFormat("MM/dd HH:mm", Locale.JAPANESE)
         holder.itemMessage.text = item.message
-        if (item.timestamp != null) {
-            val timestamp = sdf.format(item.timestamp)
-            holder.itemTimestamp.text = timestamp
-        }
+        val timestamp = sdf.format(item.timestamp)
+        holder.itemTimestamp.text = timestamp
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatViewHolder =
-        ChatViewHolder(LayoutInflater.from(context).inflate(R.layout.chat_block, parent, false))
+        ChatViewHolder(LayoutInflater.from(context).inflate(R.layout.chat_block, parent,
+            false))
 }

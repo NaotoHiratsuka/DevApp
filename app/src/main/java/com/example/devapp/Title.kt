@@ -14,7 +14,7 @@ class TitleActivity : AppCompatActivity() {
         val button = findViewById<Button>(R.id.login)
 
         button.setOnClickListener {
-            val intent = Intent(this, ChatActivity::class.java)
+            val intent = Intent(this, RoomActivity::class.java)
             startActivity(intent)
         }
     }
